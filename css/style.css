@@ -314,3 +314,20 @@ body {
 #timeline-container {
   display: none; /* 默认隐藏 */
 }
+.filter-btn {
+  cursor: pointer;
+  border: 1px solid #eee;
+  background: #fafafa;
+  transition: 0.2s;
+}
+
+.filter-btn:hover {
+  background: #f0f0f0;
+}
+
+.filter-btn.active-filter {
+  background: #ffe8e8;
+  border-color: #e63946;
+  color: #e63946;
+  transform: scale(1.05);
+}

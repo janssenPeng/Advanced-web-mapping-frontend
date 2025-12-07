@@ -5,9 +5,10 @@
   <title>CityCare Emergency Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Leaflet 样式 & 绘图插件 -->
+  <!-- Leaflet 样式 -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -39,13 +40,6 @@
     </select>
 
     <button id="start-replay">Start Replay</button>
-
-    <h3>Active Filters</h3>
-    <div id="filter-container">
-      <span class="filter-chip">Fire</span>
-      <span class="filter-chip">Medical</span>
-      <span class="filter-chip">Police</span>
-    </div>
   </aside>
 
   <!-- 右侧信息卡片 -->
@@ -57,7 +51,8 @@
 
     <div class="info-item">
       <div class="info-title">📦 Total Emergencies</div>
-      <div class="info-value" id="emergency-count">0 loaded</div>
+      <!-- 🔥 map.js 使用 total-emergencies -->
+      <div class="info-value" id="total-emergencies">0</div>
     </div>
 
     <div class="info-item">
@@ -65,11 +60,29 @@
       <div class="info-value" id="replay-status">Not started</div>
     </div>
 
+    <!-- ⭐ map.js 使用 stat-fire / stat-medical / stat-flood / stat-other -->
     <div class="counter-row">
-      <div class="counter-box">0 <small>Fire</small></div>
-      <div class="counter-box">0 <small>Medical</small></div>
-      <div class="counter-box">0 <small>Police</small></div>
+      <button class="counter-box filter-btn" data-type="fire">
+        <span id="stat-fire">0</span>
+        <small>Fire</small>
+      </button>
+    
+      <button class="counter-box filter-btn" data-type="medical">
+        <span id="stat-medical">0</span>
+        <small>Medical</small>
+      </button>
+    
+      <button class="counter-box filter-btn" data-type="flood">
+        <span id="stat-flood">0</span>
+        <small>Flood</small>
+      </button>
+    
+      <button class="counter-box filter-btn" data-type="other">
+        <span id="stat-other">0</span>
+        <small>Other</small>
+      </button>
     </div>
+    
   </aside>
 
   <!-- 底部时间轴 -->
@@ -93,7 +106,7 @@
     </div>
   </div>
 
-  <!-- 地图 -->
+  <!-- 地图区域 -->
   <div id="map"></div>
 
   <!-- Leaflet -->
@@ -103,6 +116,4 @@
   <!-- JS -->
   <script src="js/map.js"></script>
 </body>
-
-
 </html>
