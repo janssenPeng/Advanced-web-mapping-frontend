@@ -52,12 +52,8 @@ body {
  Leaflet Map
 ========================================================= */
 #map {
-  position: absolute;
-  top: 70px;                         /* ⭐ 避开 header */
-  left: 0;
+  height: 100vh;
   width: 100vw;
-  height: calc(100vh - 70px);       /* ⭐ 剩下空间全给地图 */
-  z-index: 1;
 }
 
 /* =========================================================
@@ -247,15 +243,12 @@ body {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
 
-  display: none; /* 默认隐藏 */
+  display: flex;
   align-items: center;
   gap: 16px;
 
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
   z-index: 999;
-
-  /* ⭐ 关键：避免遮挡地图交互 */
-  pointer-events: none;
 }
 
 /* Buttons (Play / Pause) */
@@ -269,7 +262,6 @@ body {
   border-radius: 8px;
 
   transition: background 0.2s ease;
-  pointer-events: auto; /* 允许点击 */
 }
 
 .timeline-btn:hover {
@@ -283,7 +275,6 @@ body {
 
   background: #ddd;
   border-radius: 10px;
-  pointer-events: auto;
 }
 
 #timeline-slider::-webkit-slider-thumb {
@@ -300,7 +291,6 @@ body {
 .timeline-time {
   font-size: 14px;
   color: #444;
-  pointer-events: auto;
 }
 
 /* Speed Dropdown */
@@ -308,17 +298,19 @@ body {
   padding: 5px 8px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  pointer-events: auto;
 }
-
-/* Zoom Control Position Fix */
 .leaflet-control-zoom {
   position: fixed !important;
   right: 20px !important;
-  bottom: 20px !important;
+  bottom: 20px !important; /* 留出 timeline 的空间 */
   z-index: 9999 !important;
 
+  /* 让它看起来更简洁、像 Figma UI */
   border-radius: 12px !important;
   overflow: hidden !important;
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+#timeline-container {
+  display: none; /* 默认隐藏 */
 }
