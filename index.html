@@ -39,36 +39,49 @@
     </select>
 
     <button id="start-replay">Start Replay</button>
-
-    <h3>Active Filters</h3>
-    <div id="filter-container">
-      <span class="filter-chip">Fire</span>
-      <span class="filter-chip">Medical</span>
-      <span class="filter-chip">Police</span>
-    </div>
   </aside>
 
   <!-- 右侧信息卡片 -->
   <aside id="info-card">
+    <!-- Location -->
     <div class="info-item">
       <div class="info-title">📌 Your Location</div>
       <div class="info-value" id="user-location">Loading...</div>
     </div>
 
+    <!-- Total -->
     <div class="info-item">
       <div class="info-title">📦 Total Emergencies</div>
-      <div class="info-value" id="emergency-count">0 loaded</div>
+      <div class="info-value" id="total-emergencies">0</div>
     </div>
 
+    <!-- Replay -->
     <div class="info-item">
       <div class="info-title">⏱ Replay Status</div>
       <div class="info-value" id="replay-status">Not started</div>
     </div>
 
+    <!-- Counter row (dynamic!) -->
     <div class="counter-row">
-      <div class="counter-box">0 <small>Fire</small></div>
-      <div class="counter-box">0 <small>Medical</small></div>
-      <div class="counter-box">0 <small>Police</small></div>
+      <div class="counter-box">
+        <span id="stat-fire">0</span>
+        <small>Fire</small>
+      </div>
+
+      <div class="counter-box">
+        <span id="stat-medical">0</span>
+        <small>Medical</small>
+      </div>
+
+      <div class="counter-box">
+        <span id="stat-flood">0</span>
+        <small>Flood</small>
+      </div>
+
+      <div class="counter-box">
+        <span id="stat-other">0</span>
+        <small>Other</small>
+      </div>
     </div>
   </aside>
 
@@ -99,10 +112,3 @@
   <!-- Leaflet -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-
-  <!-- JS -->
-  <script src="js/map.js"></script>
-</body>
-
-
-</html>

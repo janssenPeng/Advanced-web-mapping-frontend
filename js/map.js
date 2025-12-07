@@ -56,7 +56,7 @@ map.whenReady(() => {
 })
 
 // ================================
-// 🚨 加载所有事件
+// 🚨 加载所有事件 + 自动统计类型
 // ================================
 async function loadEmergencies () {
   try {
@@ -67,6 +67,32 @@ async function loadEmergencies () {
 
     const geoData = data.type ? data : { type: "FeatureCollection", features: [] }
 
+    // ========================
+    // 📊 新增：自动统计 emergency 数量
+    // ========================
+    const stats = { fire: 0, medical: 0, flood: 0, other: 0 }
+
+    geoData.features.forEach(f => {
+      const type = (f.properties.type || "").toLowerCase()
+      if (stats[type] !== undefined) stats[type]++
+      else stats.other++
+    })
+
+    // 更新右侧卡片（需要 HTML 中有这些 ID）
+    if (document.getElementById("stat-fire"))
+      document.getElementById("stat-fire").textContent = stats.fire
+    if (document.getElementById("stat-medical"))
+      document.getElementById("stat-medical").textContent = stats.medical
+    if (document.getElementById("stat-flood"))
+      document.getElementById("stat-flood").textContent = stats.flood
+    if (document.getElementById("stat-other"))
+      document.getElementById("stat-other").textContent = stats.other
+
+    if (document.getElementById("total-emergencies"))
+      document.getElementById("total-emergencies").textContent = geoData.features.length
+    // ========================
+
+    // 渲染地图图标
     L.geoJSON(geoData, {
       pointToLayer: (feature, latlng) =>
         L.marker(latlng, {
@@ -82,7 +108,10 @@ async function loadEmergencies () {
         `),
     }).addTo(emergencyLayer)
 
-    document.getElementById("emergency-count").textContent = `${geoData.features.length} loaded`
+    // 左上角数量
+    if (document.getElementById("emergency-count"))
+      document.getElementById("emergency-count").textContent = `${geoData.features.length} loaded`
+
     console.log("✅ Emergencies updated:", geoData.features.length)
   } catch (err) {
     console.error("❌ Failed to load emergencies:", err)
@@ -173,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCluster = document.getElementById("btnCluster")
   const btnReplay = document.getElementById("start-replay")
 
-  // ========= Replay ==========
+  // Replay
   btnReplay.addEventListener("click", async () => {
     const hours = document.getElementById("replay-hours").value
 
@@ -302,7 +331,6 @@ async function renderGeoData (apiUrl, color = "red") {
 // 🎬 Replay + Timeline 控制（FPS Engine, 默认 1FPS）
 // =====================================================
 
-// UI elements
 const timeline = document.getElementById("timeline-container");
 const slider = document.getElementById("timeline-slider");
 const timeLabel = document.getElementById("timeline-current");
@@ -317,7 +345,6 @@ let replaySpeed = 1;
 
 let replayLoop = null;
 
-// ⭐ 默认 FPS = 1（每秒 1 个事件）
 const BASE_FPS = 1;
 
 // 转换类型 → emoji
@@ -338,24 +365,20 @@ function resetTimelineUI() {
   timeLabel.textContent = "Event 1 / ?";
 }
 
-// Pause & Play
 pauseBtn.addEventListener("click", () => replayPaused = true);
 playBtn.addEventListener("click", () => replayPaused = false);
 
-// Speed change
 speedSelect.addEventListener("change", () => {
   replaySpeed = Number(speedSelect.value);
   startReplayEngine();
 });
 
-// Dragging
 slider.addEventListener("input", () => {
   if (!replayEvents.length) return;
   replayIndex = Math.floor((slider.value / 100) * (replayEvents.length - 1));
   updateReplayFrame(replayIndex);
 });
 
-// Render all events up to index i
 function updateReplayFrame(i) {
   emergencyLayer.clearLayers();
 
@@ -386,7 +409,6 @@ function updateReplayFrame(i) {
     `${getTypeIcon(ev.properties.type)} ${ev.properties.type} • Event ${i + 1} / ${replayEvents.length}`;
 }
 
-// FPS-based engine
 function startReplayEngine() {
   if (replayLoop) clearInterval(replayLoop);
 
@@ -408,7 +430,6 @@ function startReplayEngine() {
   }, interval);
 }
 
-// Main replay entry
 function replayEmergencies(events) {
   replayEvents = events;
   replayIndex = 0;
