@@ -21,7 +21,7 @@ let userMarker = null
 let userCircle = null
 
 // =======================================
-// 🔥 新增：过滤功能状态
+// 🔥 过滤功能状态
 // =======================================
 let activeFilter = null;
 
@@ -50,7 +50,7 @@ map.whenReady(() => {
         document.getElementById("user-location").textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`
       },
       function (err) {
-        alert("Unable to access your location. Defaulting to Dublin city center.")
+        alert("Unable to access location.")
       }
     )
   }
@@ -67,9 +67,7 @@ async function loadEmergencies () {
 
     const geoData = data.type ? data : { type: "FeatureCollection", features: [] }
 
-    // -------------------------
-    // 📊 统计事件数量
-    // -------------------------
+    // 📊 统计数量
     const stats = { fire: 0, medical: 0, flood: 0, other: 0 }
     geoData.features.forEach(f => {
       const type = (f.properties.type || "").toLowerCase()
@@ -77,27 +75,24 @@ async function loadEmergencies () {
       else stats.other++
     })
 
-    // 更新右侧卡片数字
     document.getElementById("stat-fire").textContent = stats.fire
     document.getElementById("stat-medical").textContent = stats.medical
     document.getElementById("stat-flood").textContent = stats.flood
     document.getElementById("stat-other").textContent = stats.other
-
     document.getElementById("total-emergencies").textContent = geoData.features.length
 
-    // -------------------------
-    // ⭐ 如果正在过滤，则不刷新地图
-    // -------------------------
+    // ⭐ 如果用户正在过滤，不刷新整层
     if (activeFilter !== null) {
       applyTypeFilter(activeFilter);
       return;
     }
 
-    // 渲染全部事件
+    // 🗺️ 渲染事件（加入删除按钮）
     emergencyLayer.clearLayers()
     L.geoJSON(geoData, {
-      pointToLayer: (feature, latlng) =>
-        L.marker(latlng, { 
+      pointToLayer: (feature, latlng) => {
+        const id = feature.properties.id;
+        return L.marker(latlng, {
           icon: L.icon({
             iconUrl: getIconUrl(feature.properties.type),
             iconSize: [28, 28],
@@ -106,8 +101,20 @@ async function loadEmergencies () {
           <b>${feature.properties.title}</b><br>
           ${feature.properties.description}<br>
           <i>${feature.properties.type}</i><br>
-          ${new Date(feature.properties.reported_at).toLocaleString()}
-        `)
+          ${new Date(feature.properties.reported_at).toLocaleString()}<br><br>
+
+          <button onclick="deleteEmergency(${id})"
+            style="
+              padding:6px 10px;
+              border-radius:8px;
+              border:none;
+              background:#E63946;
+              color:white;
+              cursor:pointer;">
+            🗑 Delete
+          </button>
+        `);
+      }
     }).addTo(emergencyLayer)
 
     document.getElementById("emergency-count").textContent = `${geoData.features.length} loaded`
@@ -130,24 +137,20 @@ setInterval(loadEmergencies, 10000)
 
 
 // =======================================
-// 🔥 新增：右侧按钮过滤事件
+// 🔥 右侧按钮过滤事件
 // =======================================
-
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const type = btn.getAttribute("data-type");
 
-    // toggle：取消过滤
     if (activeFilter === type) {
       activeFilter = null;
       document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active-filter"));
-      loadEmergencies(); // 显示全部
+      loadEmergencies();
       return;
     }
 
-    // 设置新的过滤
     activeFilter = type;
-
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active-filter"));
     btn.classList.add("active-filter");
 
@@ -249,7 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCluster = document.getElementById("btnCluster")
   const btnReplay = document.getElementById("start-replay")
 
-  // Replay
   btnReplay.addEventListener("click", async () => {
     const hours = document.getElementById("replay-hours").value
 
@@ -265,7 +267,6 @@ document.addEventListener("DOMContentLoaded", () => {
     replayEmergencies(features)
   })
 
-  // Nearby
   btnNearby.addEventListener("click", async () => {
     if (!window.userLocation) return alert("Please allow location access first.")
     const { lat, lon } = window.userLocation
@@ -281,7 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderGeoData(url, "green")
   })
 
-  // Closest
   btnClosest.addEventListener("click", async () => {
     if (!window.userLocation) return alert("Please allow location access first.")
     const { lat, lon } = window.userLocation
@@ -289,7 +289,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderGeoData(url, "red")
   })
 
-  // Within Area
   btnArea.addEventListener("click", async () => {
     const b = map.getBounds()
     const coords = [[
@@ -323,7 +322,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   })
 
-  // Cluster
   btnCluster.addEventListener("click", async () => {
     const res = await fetch(`${API_BASE}/api/emergencies/cluster_summary/`)
     const data = await res.json()
@@ -376,9 +374,8 @@ async function renderGeoData (apiUrl, color = "red") {
 
 
 // =====================================================
-// 🎬 Replay + Timeline 控制（保持原状）
+// 🎬 Replay 控制（保持原状）
 // =====================================================
-
 const timeline = document.getElementById("timeline-container");
 const slider = document.getElementById("timeline-slider");
 const timeLabel = document.getElementById("timeline-current");
@@ -390,7 +387,6 @@ let replayPaused = false;
 let replayIndex = 0;
 let replayEvents = [];
 let replaySpeed = 1;
-
 let replayLoop = null;
 
 const BASE_FPS = 1;
@@ -487,4 +483,28 @@ function replayEmergencies(events) {
   emergencyLayer.clearLayers();
 
   startReplayEngine();
+}
+
+
+// =======================================
+// 🗑️ 新增：删除事件
+// =======================================
+async function deleteEmergency(id) {
+  if (!confirm("Are you sure you want to delete this emergency?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/emergencies/${id}/`, {
+      method: "DELETE"
+    });
+
+    if (res.ok) {
+      alert("✅ Emergency deleted!");
+      loadEmergencies();
+    } else {
+      alert("❌ Failed to delete emergency.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error deleting emergency.");
+  }
 }
