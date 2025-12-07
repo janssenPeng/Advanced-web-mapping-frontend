@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CityCare Emergency Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet 样式 & 绘图插件 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- 顶部栏 -->
+  <header class="header-bar">
+    <div class="header-left">
+      <h1>🚨 CityCare Emergency Map</h1>
+      <p>Real-time emergency visualization and spatial analysis</p>
+    </div>
+  </header>
+
+  <!-- 左侧控制面板 -->
+  <aside id="controls">
+    <h3>Spatial Analysis Tools</h3>
+    <button id="btnNearby">📍 Nearby</button>
+    <button id="btnClosest">🧭 Closest</button>
+    <button id="btnArea">🧩 Within Area</button>
+    <button id="btnCluster">📊 Clusters</button>
+
+    <h3>Replay Emergency Timeline</h3>
+    <select id="replay-hours">
+      <option value="1">Replay last 1 hour</option>
+      <option value="3">Replay last 3 hours</option>
+      <option value="6">Replay last 6 hours</option>
+      <option value="12">Replay last 12 hours</option>
+      <option value="24">Replay last 24 hours</option>
+    </select>
+
+    <button id="start-replay">Start Replay</button>
+
+    <h3>Active Filters</h3>
+    <div id="filter-container">
+      <span class="filter-chip">Fire</span>
+      <span class="filter-chip">Medical</span>
+      <span class="filter-chip">Police</span>
+    </div>
+  </aside>
+
+  <!-- 右侧信息卡片 -->
+  <aside id="info-card">
+    <div class="info-item">
+      <div class="info-title">📌 Your Location</div>
+      <div class="info-value" id="user-location">Loading...</div>
+    </div>
+
+    <div class="info-item">
+      <div class="info-title">📦 Total Emergencies</div>
+      <div class="info-value" id="emergency-count">0 loaded</div>
+    </div>
+
+    <div class="info-item">
+      <div class="info-title">⏱ Replay Status</div>
+      <div class="info-value" id="replay-status">Not started</div>
+    </div>
+
+    <div class="counter-row">
+      <div class="counter-box">0 <small>Fire</small></div>
+      <div class="counter-box">0 <small>Medical</small></div>
+      <div class="counter-box">0 <small>Police</small></div>
+    </div>
+  </aside>
+
+  <!-- 底部时间轴 -->
+  <div id="timeline-container">
+    <button class="timeline-btn" id="replay-play">▶️</button>
+    <button class="timeline-btn" id="replay-pause">⏸</button>
+
+    <input type="range" id="timeline-slider" min="0" max="100" value="0">
+
+    <div class="timeline-time" id="timeline-current">00:00</div>
+
+    <div class="timeline-speed">
+      Speed:
+      <select id="replay-speed">
+        <option value="0.01">00.1x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="2">2x</option>
+        <option value="4">4x</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 地图 -->
+  <div id="map"></div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+  <!-- JS -->
+  <script src="js/map.js"></script>
+</body>
+
+
+</html>

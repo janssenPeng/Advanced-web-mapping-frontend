@@ -1,0 +1,316 @@
+/* =========================================================
+   Global Reset
+========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, Arial, sans-serif;
+  background: #f4f6f8;
+  overflow: hidden;
+}
+
+/* =========================================================
+ Header Bar (Top)
+========================================================= */
+.header-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 70px;
+
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 25px;
+
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  z-index: 900;
+}
+
+.header-left h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #E63946;
+}
+
+.header-left p {
+  font-size: 13px;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* =========================================================
+ Leaflet Map
+========================================================= */
+#map {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* =========================================================
+ Left Sidebar (Figma Card)
+========================================================= */
+#controls {
+  position: absolute;
+  top: 90px;
+  left: 20px;
+  width: 260px;
+
+  padding: 22px;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+
+  z-index: 999;
+}
+
+/* Section Titles */
+#controls h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+  margin-top: 18px;
+}
+
+/* Buttons */
+#controls button {
+  width: 100%;
+  padding: 12px 14px;
+
+  font-size: 15px;
+  text-align: left;
+
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+
+  cursor: pointer;
+  margin-top: 8px;
+
+  transition: all 0.2s ease;
+}
+
+#controls button:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+  transform: translateY(-1px);
+}
+
+/* Replay Dropdown */
+#controls select {
+  width: 100%;
+  padding: 10px;
+
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Replay Main Button */
+#start-replay {
+  width: 100%;
+  margin-top: 12px;
+
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+
+  background: #E63946;
+  color: #444;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#start-replay:hover {
+  background: #c22530;
+}
+
+/* Active Filters */
+.filter-chip {
+  display: inline-block;
+
+  padding: 5px 10px;
+  border-radius: 12px;
+
+  background: #ffe8e8;
+  color: #e63946;
+
+  font-size: 12px;
+  margin-right: 5px;
+  margin-top: 6px;
+}
+
+/* =========================================================
+ Right Info Card
+========================================================= */
+#info-card {
+  position: absolute;
+  top: 90px;
+  right: 20px;
+
+  width: 260px;
+  padding: 20px;
+
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+
+  z-index: 999;
+}
+
+.info-item {
+  margin-bottom: 15px;
+}
+
+.info-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.info-value {
+  font-size: 13px;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Counters (Fire / Medical / Police) */
+.counter-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.counter-box {
+  width: 30%;
+  text-align: center;
+
+  padding: 10px 5px;
+
+  border-radius: 12px;
+  background: #fafafa;
+  border: 1px solid #eee;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #333;
+}
+
+.counter-box small {
+  display: block;
+  font-size: 11px;
+  color: #888;
+}
+
+/* =========================================================
+ Bottom Timeline Player
+========================================================= */
+#timeline-container {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 90%;
+  max-width: 900px;
+
+  padding: 14px 20px;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+/* Buttons (Play / Pause) */
+.timeline-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  padding: 6px;
+  font-size: 22px;
+  border-radius: 8px;
+
+  transition: background 0.2s ease;
+}
+
+.timeline-btn:hover {
+  background: #eee;
+}
+
+/* Replay Slider */
+#timeline-slider {
+  flex: 1;
+  height: 6px;
+
+  background: #ddd;
+  border-radius: 10px;
+}
+
+#timeline-slider::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+
+  background: #E63946;
+  border-radius: 50%;
+
+  cursor: pointer;
+}
+
+/* Time Display */
+.timeline-time {
+  font-size: 14px;
+  color: #444;
+}
+
+/* Speed Dropdown */
+#replay-speed {
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+.leaflet-control-zoom {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important; /* 留出 timeline 的空间 */
+  z-index: 9999 !important;
+
+  /* 让它看起来更简洁、像 Figma UI */
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+#timeline-container {
+  display: none; /* 默认隐藏 */
+}
