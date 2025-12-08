@@ -51,8 +51,13 @@
 
     <div class="info-item">
       <div class="info-title">📦 Total Emergencies</div>
-      <!-- 🔥 map.js 使用 total-emergencies -->
       <div class="info-value" id="total-emergencies">0</div>
+    </div>
+
+    <!-- ⭐ 新增 emergency-count，修复 map.js 崩溃 -->
+    <div class="info-item">
+      <div class="info-title">📊 Loaded</div>
+      <div class="info-value" id="emergency-count">0</div>
     </div>
 
     <div class="info-item">
@@ -60,7 +65,7 @@
       <div class="info-value" id="replay-status">Not started</div>
     </div>
 
-    <!-- ⭐ map.js 使用 stat-fire / stat-medical / stat-flood / stat-other -->
+    <!-- 事件类型统计 -->
     <div class="counter-row">
       <button class="counter-box filter-btn" data-type="fire">
         <span id="stat-fire">0</span>
@@ -82,7 +87,6 @@
         <small>Other</small>
       </button>
     </div>
-    
   </aside>
 
   <!-- 底部时间轴 -->

@@ -1,12 +1,52 @@
 console.log("✅ map.js is loaded and running")
 
 // ================================
-// 🌐 后端 API 基础地址（Render）
+// 🌐 后端 API 基础地址
 // ================================
 const API_BASE = "https://advanced-web-mapping-citycare.onrender.com";
+// const API_BASE = "http://localhost:8000";
 
 // ================================
-// 🗺️ 初始化地图（默认都柏林）
+// ⭐ NEW：给每个浏览器生成一个用户 ID
+// ================================
+const USER_ID = (() => {
+  try {
+    const key = "citycare_user_id";
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = "browser_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(key, id);
+    }
+    return id;
+  } catch {
+    return "browser_" + Math.random().toString(36).slice(2, 10);
+  }
+})();
+
+// ================================
+// ⭐ NEW：上传用户实时位置至后端
+// ================================
+async function sendLocationHeartbeat(lat, lon) {
+  try {
+    await fetch(`${API_BASE}/api/users/update_location/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: USER_ID,
+        location: {
+          type: "Point",
+          coordinates: [lon, lat], // GeoJSON = [lng, lat]
+        },
+      }),
+    });
+  } catch (err) {
+    console.error("❌ Failed to send location heartbeat:", err);
+  }
+}
+
+
+// ================================
+// 🗺️ 初始化地图
 // ================================
 const map = L.map("map").setView([53.3498, -6.2603], 12)
 
@@ -20,13 +60,18 @@ let emergencyLayer = L.layerGroup().addTo(map)
 let userMarker = null
 let userCircle = null
 
-// =======================================
-// 🔥 过滤功能状态
-// =======================================
-let activeFilter = null;
+// ⭐ NEW 多用户实时定位 Layer
+let activeUsersLayer = L.layerGroup().addTo(map);
+
 
 // ================================
-// 📍 获取用户当前位置
+// 🔥 过滤功能状态
+// ================================
+let activeFilter = null;
+
+
+// ================================
+// 📍 获取用户当前位置 + 上报到后端
 // ================================
 map.whenReady(() => {
   if (navigator.geolocation) {
@@ -47,9 +92,19 @@ map.whenReady(() => {
 
         map.setView([lat, lon], 13)
         window.userLocation = { lat, lon }
-        document.getElementById("user-location").textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`
+        document.getElementById("user-location").textContent =
+          `${lat.toFixed(4)}, ${lon.toFixed(4)}`
+
+        sendLocationHeartbeat(lat, lon);
+
+        setInterval(() => {
+          if (window.userLocation) {
+            sendLocationHeartbeat(window.userLocation.lat, window.userLocation.lon);
+          }
+        }, 10000);
+
       },
-      function (err) {
+      function () {
         alert("Unable to access location.")
       }
     )
@@ -58,16 +113,74 @@ map.whenReady(() => {
 
 
 // ================================
-// 🚨 加载所有事件 + 统计（支持过滤）
+// ⭐ 渲染所有在线用户（WKT → lat/lng + 修复过滤）
 // ================================
-async function loadEmergencies () {
+async function loadActiveUsers() {
+  try {
+    const res = await fetch(`${API_BASE}/api/users/active/`);
+    const data = await res.json();
+
+    const features = data.features || [];
+    activeUsersLayer.clearLayers();
+
+    features.forEach((f) => {
+      if (!f.geometry) return;
+
+      let lng, lat;
+
+      // ⭐ 解析 WKT: "SRID=4326;POINT (lng lat)"
+      if (typeof f.geometry === "string") {
+        const match = f.geometry.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+        if (!match) {
+          console.warn("⚠️ Could not parse WKT:", f.geometry);
+          return;
+        }
+        lng = parseFloat(match[1]);
+        lat = parseFloat(match[2]);
+      }
+
+      else if (typeof f.geometry === "object" && Array.isArray(f.geometry.coordinates)) {
+        [lng, lat] = f.geometry.coordinates;
+      }
+
+      const uid = f.properties.user_id;
+      const lastSeen = f.properties.last_seen;
+
+      if (uid === USER_ID) return;
+
+      L.circleMarker([lat, lng], {
+        radius: 7,
+        color: "#28a745",
+        fillColor: "#28a745",
+        fillOpacity: 0.9,
+      })
+        .addTo(activeUsersLayer)
+        .bindPopup(`
+          👤 <b>${uid}</b><br>
+          Last Seen: ${new Date(lastSeen).toLocaleString()}
+        `);
+    });
+
+  } catch (err) {
+    console.error("❌ Failed to load active users:", err);
+  }
+}
+
+setInterval(loadActiveUsers, 5000);
+loadActiveUsers();
+
+
+
+// ================================
+// 🚨 加载事件（保持原状）
+// ================================
+async function loadEmergencies() {
   try {
     const res = await fetch(`${API_BASE}/api/emergencies/`)
     const data = await res.json()
 
     const geoData = data.type ? data : { type: "FeatureCollection", features: [] }
 
-    // 📊 统计数量
     const stats = { fire: 0, medical: 0, flood: 0, other: 0 }
     geoData.features.forEach(f => {
       const type = (f.properties.type || "").toLowerCase()
@@ -81,13 +194,11 @@ async function loadEmergencies () {
     document.getElementById("stat-other").textContent = stats.other
     document.getElementById("total-emergencies").textContent = geoData.features.length
 
-    // ⭐ 如果用户正在过滤，不刷新整层
     if (activeFilter !== null) {
       applyTypeFilter(activeFilter);
       return;
     }
 
-    // 🗺️ 渲染事件（加入删除按钮）
     emergencyLayer.clearLayers()
     L.geoJSON(geoData, {
       pointToLayer: (feature, latlng) => {
@@ -117,13 +228,14 @@ async function loadEmergencies () {
       }
     }).addTo(emergencyLayer)
 
-    document.getElementById("emergency-count").textContent = `${geoData.features.length} loaded`
+    document.getElementById("emergency-count").textContent =
+      `${geoData.features.length} loaded`
   } catch (err) {
     console.error("❌ Failed to load emergencies:", err)
   }
 }
 
-function getIconUrl (type) {
+function getIconUrl(type) {
   switch (type) {
     case "fire": return "/icons/fire.png"
     case "medical": return "/icons/medical.png"
@@ -136,22 +248,24 @@ loadEmergencies()
 setInterval(loadEmergencies, 10000)
 
 
-// =======================================
+// ================================
 // 🔥 右侧按钮过滤事件
-// =======================================
+// ================================
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const type = btn.getAttribute("data-type");
 
     if (activeFilter === type) {
       activeFilter = null;
-      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active-filter"));
+      document.querySelectorAll(".filter-btn")
+        .forEach(b => b.classList.remove("active-filter"));
       loadEmergencies();
       return;
     }
 
     activeFilter = type;
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active-filter"));
+    document.querySelectorAll(".filter-btn")
+      .forEach(b => b.classList.remove("active-filter"));
     btn.classList.add("active-filter");
 
     applyTypeFilter(type);
@@ -183,7 +297,7 @@ function applyTypeFilter(type) {
 // 🧭 报告事件（保持原状）
 // ================================
 let tempMarker
-map.on("click", function (e) {
+map.on("click", function(e) {
   const { lat, lng } = e.latlng
   if (tempMarker) map.removeLayer(tempMarker)
   tempMarker = L.marker([lat, lng]).addTo(map)
@@ -243,7 +357,7 @@ map.on("click", function (e) {
 
 
 // ================================
-// 🎛️ Spatial tools + Replay（保持原状）
+// 🎛 Spatial Tools
 // ================================
 document.addEventListener("DOMContentLoaded", () => {
   const btnNearby = document.getElementById("btnNearby")
@@ -254,7 +368,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnReplay.addEventListener("click", async () => {
     const hours = document.getElementById("replay-hours").value
-
     const res = await fetch(`${API_BASE}/api/emergencies/replay/?hours=${hours}`)
     const data = await res.json()
     const features = data.features || []
@@ -263,14 +376,15 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("No emergencies found.")
       return
     }
-
     replayEmergencies(features)
   })
 
+  // ⭐ 修复：addEventProvider → addEventListener
   btnNearby.addEventListener("click", async () => {
     if (!window.userLocation) return alert("Please allow location access first.")
     const { lat, lon } = window.userLocation
-    const url = `${API_BASE}/api/emergencies/nearby/?lat=${lat}&lng=${lon}&radius=2000`
+    const url =
+      `${API_BASE}/api/emergencies/nearby/?lat=${lat}&lng=${lon}&radius=2000`
 
     if (userCircle) map.removeLayer(userCircle)
     userCircle = L.circle([lat, lon], {
@@ -311,7 +425,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = await res.json()
     emergencyLayer.clearLayers()
+
     const features = data.type === "FeatureCollection" ? data.features : data
+
     features.forEach((f) => {
       const [lng, lat] = f.geometry.coordinates
       L.circleMarker([lat, lng], {
@@ -327,6 +443,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = await res.json()
 
     emergencyLayer.clearLayers()
+
     const features = data.type === "FeatureCollection" ? data.features : data
 
     features.forEach((f) => {
@@ -344,9 +461,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ================================
-// 🔧 通用渲染函数（保持原状）
+// 🔧 通用渲染函数
 // ================================
-async function renderGeoData (apiUrl, color = "red") {
+async function renderGeoData(apiUrl, color = "red") {
   try {
     const res = await fetch(apiUrl)
     const data = await res.json()
@@ -391,8 +508,9 @@ let replayLoop = null;
 
 const BASE_FPS = 1;
 
+
 function getTypeIcon(type) {
-  switch(type) {
+  switch (type) {
     case "fire": return "🔥";
     case "medical": return "🚑";
     case "flood": return "🌊";
@@ -422,6 +540,7 @@ slider.addEventListener("input", () => {
   updateReplayFrame(replayIndex);
 });
 
+
 function updateReplayFrame(i) {
   emergencyLayer.clearLayers();
 
@@ -436,8 +555,8 @@ function updateReplayFrame(i) {
         iconSize: [28, 28],
       })
     })
-    .addTo(emergencyLayer)
-    .bindPopup(`
+      .addTo(emergencyLayer)
+      .bindPopup(`
       <b>${title}</b><br>
       ${description}<br>
       <i>${type}</i><br>
@@ -486,9 +605,9 @@ function replayEmergencies(events) {
 }
 
 
-// =======================================
-// 🗑️ 新增：删除事件
-// =======================================
+// ================================
+// 🗑️ 删除事件（保持原状）
+// ================================
 async function deleteEmergency(id) {
   if (!confirm("Are you sure you want to delete this emergency?")) return;
 
