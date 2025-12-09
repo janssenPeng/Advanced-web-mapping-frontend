@@ -1,5 +1,7 @@
 #### CityCare Emergency Map is a full-stack, location-based services (LBS) application for  real-time emergency visualisation, replay and spatial analysis.
 
+main website URL(entry): https://advanced-web-mapping-frontend.onrender.com/
+backend URL: https://advanced-web-mapping-citycare.onrender.com
 
 
 Overview – Map with emergencies:
