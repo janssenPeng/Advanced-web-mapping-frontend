@@ -69,6 +69,26 @@ let activeUsersLayer = L.layerGroup().addTo(map);
 // ================================
 let activeFilter = null;
 
+// ⭐ Replay 状态 + 自动刷新控制
+let isReplaying = false;                 // 当前是否在 Replay
+let emergenciesRefreshTimer = null;      // 自动刷新计时器 ID
+
+function startEmergenciesAutoRefresh() {
+  if (emergenciesRefreshTimer) return;   // 已经在刷就别再开
+  emergenciesRefreshTimer = setInterval(() => {
+    if (!isReplaying) {                  // Replay 时不刷新
+      loadEmergencies();
+    }
+  }, 10000);
+}
+
+function stopEmergenciesAutoRefresh() {
+  if (emergenciesRefreshTimer) {
+    clearInterval(emergenciesRefreshTimer);
+    emergenciesRefreshTimer = null;
+  }
+}
+
 
 // ================================
 // 📍 获取用户当前位置 + 上报到后端
@@ -244,8 +264,9 @@ function getIconUrl(type) {
   }
 }
 
-loadEmergencies()
-setInterval(loadEmergencies, 10000)
+// ⭐ 启动一次加载 + 自动刷新（改这里）
+loadEmergencies();
+startEmergenciesAutoRefresh();
 
 
 // ================================
@@ -491,7 +512,7 @@ async function renderGeoData(apiUrl, color = "red") {
 
 
 // =====================================================
-// 🎬 Replay 控制（保持原状）
+// 🎬 Replay 控制（保持原状 + 暂停刷新）
 // =====================================================
 const timeline = document.getElementById("timeline-container");
 const slider = document.getElementById("timeline-slider");
@@ -582,7 +603,12 @@ function startReplayEngine() {
 
     if (replayIndex >= replayEvents.length) {
       clearInterval(replayLoop);
+      replayLoop = null;
+      isReplaying = false;               // ⭐ Replay 结束
       hideTimeline();
+      // ⭐ Replay 结束后刷新一次，并恢复自动刷新
+      loadEmergencies();
+      startEmergenciesAutoRefresh();
       return;
     }
 
@@ -596,6 +622,8 @@ function replayEmergencies(events) {
   replayEvents = events;
   replayIndex = 0;
   replayPaused = false;
+  isReplaying = true;                    // ⭐ 进入 Replay 模式
+  stopEmergenciesAutoRefresh();          // ⭐ 暂停自动刷新
 
   showTimeline();
   resetTimelineUI();
