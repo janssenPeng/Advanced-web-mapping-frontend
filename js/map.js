@@ -44,6 +44,19 @@ async function sendLocationHeartbeat(lat, lon) {
   }
 }
 
+//mobile
+const mobilePanel = document.getElementById("mobile-panel");
+const toggleBtn = document.getElementById("mobile-toggle-btn");
+const closeBtn = document.getElementById("mobile-close-btn");
+
+const controls = document.getElementById("controls");
+const infoCard = document.getElementById("info-card");
+
+// 原始父容器位置（桌面端用）
+const originalParent = controls.parentElement;
+
+const panel = document.getElementById("mobile-panel");
+const handle = document.getElementById("mobile-drag-handle");
 
 // ================================
 // 🗺️ 初始化地图
@@ -655,3 +668,83 @@ async function deleteEmergency(id) {
     alert("❌ Error deleting emergency.");
   }
 }
+
+// 每次 resize 都检查是否为手机端
+function handleResponsiveLayout() {
+  if (window.innerWidth <= 768) {
+      // 移动组件到 mobile panel
+      if (!mobilePanel.contains(controls)) {
+          mobilePanel.appendChild(controls);
+      }
+      if (!mobilePanel.contains(infoCard)) {
+          mobilePanel.appendChild(infoCard);
+      }
+
+      // 默认隐藏
+      mobilePanel.style.display = "none";
+      controls.style.display = "block";
+      infoCard.style.display = "block";
+
+  } else {
+      // 移回桌面版
+      if (originalParent && !originalParent.contains(controls)) {
+          originalParent.appendChild(controls);
+          originalParent.appendChild(infoCard);
+      }
+
+      // 桌面端恢复显示
+      controls.style.display = "block";
+      infoCard.style.display = "block";
+      mobilePanel.style.display = "none";
+  }
+}
+
+toggleBtn.addEventListener("click", () => {
+  mobilePanel.style.display = "block";
+});
+
+closeBtn.addEventListener("click", () => {
+  mobilePanel.style.display = "none";
+});
+
+// 初始化
+handleResponsiveLayout();
+window.addEventListener("resize", handleResponsiveLayout);
+
+//拖拽伸缩
+let startY = 0;
+let startHeight = 0;
+
+handle.addEventListener("touchstart", (e) => {
+  startY = e.touches[0].clientY;
+  startHeight = panel.offsetHeight;
+
+  panel.style.transition = "none";
+});
+
+handle.addEventListener("touchmove", (e) => {
+  const dy = startY - e.touches[0].clientY;
+  let newHeight = startHeight + dy;
+
+  // Minimum and maximum heights
+  newHeight = Math.min(window.innerHeight * 0.95, newHeight);
+  newHeight = Math.max(80, newHeight);
+
+  panel.style.height = newHeight + "px";
+});
+
+handle.addEventListener("touchend", () => {
+  panel.style.transition = "0.25s ease";
+
+  // Snap to states
+  if (panel.offsetHeight < window.innerHeight * 0.3) {
+    panel.style.height = "0px";
+    panel.style.display = "none";
+  }
+  else if (panel.offsetHeight < window.innerHeight * 0.6) {
+    panel.style.height = "50%";
+  }
+  else {
+    panel.style.height = "75%";
+  }
+});
