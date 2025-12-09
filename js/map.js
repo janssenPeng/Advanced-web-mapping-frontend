@@ -1,14 +1,10 @@
 console.log("✅ map.js is loaded and running")
 
-// ================================
-// 🌐 后端 API 基础地址
-// ================================
+
 const API_BASE = "https://advanced-web-mapping-citycare.onrender.com";
 // const API_BASE = "http://localhost:8000";
 
-// ================================
-// ⭐ NEW：给每个浏览器生成一个用户 ID
-// ================================
+
 const USER_ID = (() => {
   try {
     const key = "citycare_user_id";
@@ -23,9 +19,7 @@ const USER_ID = (() => {
   }
 })();
 
-// ================================
-// ⭐ NEW：上传用户实时位置至后端
-// ================================
+
 async function sendLocationHeartbeat(lat, lon) {
   try {
     await fetch(`${API_BASE}/api/users/update_location/`, {
@@ -52,15 +46,13 @@ const closeBtn = document.getElementById("mobile-close-btn");
 const controls = document.getElementById("controls");
 const infoCard = document.getElementById("info-card");
 
-// 原始父容器位置（桌面端用）
+
 const originalParent = controls.parentElement;
 
 const panel = document.getElementById("mobile-panel");
 const handle = document.getElementById("mobile-drag-handle");
 
-// ================================
-// 🗺️ 初始化地图
-// ================================
+
 const map = L.map("map").setView([53.3498, -6.2603], 12)
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -73,23 +65,21 @@ let emergencyLayer = L.layerGroup().addTo(map)
 let userMarker = null
 let userCircle = null
 
-// ⭐ NEW 多用户实时定位 Layer
+
 let activeUsersLayer = L.layerGroup().addTo(map);
 
 
-// ================================
-// 🔥 过滤功能状态
-// ================================
+
 let activeFilter = null;
 
-// ⭐ Replay 状态 + 自动刷新控制
-let isReplaying = false;                 // 当前是否在 Replay
-let emergenciesRefreshTimer = null;      // 自动刷新计时器 ID
+
+let isReplaying = false;                 
+let emergenciesRefreshTimer = null;      
 
 function startEmergenciesAutoRefresh() {
-  if (emergenciesRefreshTimer) return;   // 已经在刷就别再开
+  if (emergenciesRefreshTimer) return;  
   emergenciesRefreshTimer = setInterval(() => {
-    if (!isReplaying) {                  // Replay 时不刷新
+    if (!isReplaying) {                
       loadEmergencies();
     }
   }, 10000);
@@ -103,9 +93,7 @@ function stopEmergenciesAutoRefresh() {
 }
 
 
-// ================================
-// 📍 获取用户当前位置 + 上报到后端
-// ================================
+
 map.whenReady(() => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -145,9 +133,7 @@ map.whenReady(() => {
 })
 
 
-// ================================
-// ⭐ 渲染所有在线用户（WKT → lat/lng + 修复过滤）
-// ================================
+
 async function loadActiveUsers() {
   try {
     const res = await fetch(`${API_BASE}/api/users/active/`);
@@ -161,7 +147,7 @@ async function loadActiveUsers() {
 
       let lng, lat;
 
-      // ⭐ 解析 WKT: "SRID=4326;POINT (lng lat)"
+      
       if (typeof f.geometry === "string") {
         const match = f.geometry.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
         if (!match) {
@@ -204,9 +190,7 @@ loadActiveUsers();
 
 
 
-// ================================
-// 🚨 加载事件（保持原状）
-// ================================
+
 async function loadEmergencies() {
   try {
     const res = await fetch(`${API_BASE}/api/emergencies/`)
@@ -277,14 +261,12 @@ function getIconUrl(type) {
   }
 }
 
-// ⭐ 启动一次加载 + 自动刷新（改这里）
+
 loadEmergencies();
 startEmergenciesAutoRefresh();
 
 
-// ================================
-// 🔥 右侧按钮过滤事件
-// ================================
+
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const type = btn.getAttribute("data-type");
@@ -327,9 +309,7 @@ function applyTypeFilter(type) {
 }
 
 
-// ================================
-// 🧭 报告事件（保持原状）
-// ================================
+
 let tempMarker
 map.on("click", function(e) {
   const { lat, lng } = e.latlng
@@ -390,9 +370,7 @@ map.on("click", function(e) {
 })
 
 
-// ================================
-// 🎛 Spatial Tools
-// ================================
+
 document.addEventListener("DOMContentLoaded", () => {
   const btnNearby = document.getElementById("btnNearby")
   const btnClosest = document.getElementById("btnClosest")
@@ -413,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
     replayEmergencies(features)
   })
 
-  // ⭐ 修复：addEventProvider → addEventListener
+  
   btnNearby.addEventListener("click", async () => {
     if (!window.userLocation) return alert("Please allow location access first.")
     const { lat, lon } = window.userLocation
@@ -494,9 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 
-// ================================
-// 🔧 通用渲染函数
-// ================================
+
 async function renderGeoData(apiUrl, color = "red") {
   try {
     const res = await fetch(apiUrl)
@@ -524,9 +500,7 @@ async function renderGeoData(apiUrl, color = "red") {
 }
 
 
-// =====================================================
-// 🎬 Replay 控制（保持原状 + 暂停刷新）
-// =====================================================
+
 const timeline = document.getElementById("timeline-container");
 const slider = document.getElementById("timeline-slider");
 const timeLabel = document.getElementById("timeline-current");
@@ -617,9 +591,9 @@ function startReplayEngine() {
     if (replayIndex >= replayEvents.length) {
       clearInterval(replayLoop);
       replayLoop = null;
-      isReplaying = false;               // ⭐ Replay 结束
+      isReplaying = false;             
       hideTimeline();
-      // ⭐ Replay 结束后刷新一次，并恢复自动刷新
+      
       loadEmergencies();
       startEmergenciesAutoRefresh();
       return;
@@ -635,8 +609,8 @@ function replayEmergencies(events) {
   replayEvents = events;
   replayIndex = 0;
   replayPaused = false;
-  isReplaying = true;                    // ⭐ 进入 Replay 模式
-  stopEmergenciesAutoRefresh();          // ⭐ 暂停自动刷新
+  isReplaying = true;                    
+  stopEmergenciesAutoRefresh();         
 
   showTimeline();
   resetTimelineUI();
@@ -646,9 +620,7 @@ function replayEmergencies(events) {
 }
 
 
-// ================================
-// 🗑️ 删除事件（保持原状）
-// ================================
+
 async function deleteEmergency(id) {
   if (!confirm("Are you sure you want to delete this emergency?")) return;
 
@@ -669,10 +641,10 @@ async function deleteEmergency(id) {
   }
 }
 
-// 每次 resize 都检查是否为手机端
+
 function handleResponsiveLayout() {
   if (window.innerWidth <= 768) {
-      // 移动组件到 mobile panel
+      
       if (!mobilePanel.contains(controls)) {
           mobilePanel.appendChild(controls);
       }
@@ -680,19 +652,19 @@ function handleResponsiveLayout() {
           mobilePanel.appendChild(infoCard);
       }
 
-      // 默认隐藏
+      
       mobilePanel.style.display = "none";
       controls.style.display = "block";
       infoCard.style.display = "block";
 
   } else {
-      // 移回桌面版
+      
       if (originalParent && !originalParent.contains(controls)) {
           originalParent.appendChild(controls);
           originalParent.appendChild(infoCard);
       }
 
-      // 桌面端恢复显示
+      
       controls.style.display = "block";
       infoCard.style.display = "block";
       mobilePanel.style.display = "none";
@@ -707,11 +679,11 @@ closeBtn.addEventListener("click", () => {
   mobilePanel.style.display = "none";
 });
 
-// 初始化
+
 handleResponsiveLayout();
 window.addEventListener("resize", handleResponsiveLayout);
 
-//拖拽伸缩
+
 let startY = 0;
 let startHeight = 0;
 

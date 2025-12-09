@@ -1,431 +1,446 @@
-/* =========================================================
-   Global Reset
-========================================================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Inter, Arial, sans-serif;
-  background: #f4f6f8;
-  overflow: hidden;
-}
-
-/* =========================================================
- Header Bar (Top)
-========================================================= */
-.header-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 70px;
-
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-
-  display: flex;
-  align-items: center;
-
-  padding: 0 25px;
-
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  z-index: 900;
-}
-
-.header-left h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #E63946;
-}
-
-.header-left p {
-  font-size: 13px;
-  color: #666;
-  margin-top: 3px;
-}
-
-/* =========================================================
- Leaflet Map
-========================================================= */
-#map {
-  height: 100vh;
-  width: 100vw;
-}
-
-/* =========================================================
- Left Sidebar (Figma Card)
-========================================================= */
-#controls {
-  position: absolute;
-  top: 90px;
-  left: 20px;
-  width: 260px;
-
-  padding: 22px;
-  border-radius: 18px;
-
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(14px);
-
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
-
-  z-index: 999;
-}
-
-/* Section Titles */
-#controls h3 {
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 10px;
-  margin-top: 18px;
-}
-
-/* Buttons */
-#controls button {
-  width: 100%;
-  padding: 12px 14px;
-
-  font-size: 15px;
-  text-align: left;
-
-  background: #fafafa;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-
-  cursor: pointer;
-  margin-top: 8px;
-
-  transition: all 0.2s ease;
-}
-
-#controls button:hover {
-  background: #f0f0f0;
-  border-color: #ccc;
-  transform: translateY(-1px);
-}
-
-/* Replay Dropdown */
-#controls select {
-  width: 100%;
-  padding: 10px;
-
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  background: #fff;
-
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-/* Replay Main Button */
-#start-replay {
-  width: 100%;
-  margin-top: 12px;
-
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-
-  background: #E63946;
-  color: #444;
-
-  font-size: 16px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#start-replay:hover {
-  background: #c22530;
-}
-
-/* Active Filters */
-.filter-chip {
-  display: inline-block;
-
-  padding: 5px 10px;
-  border-radius: 12px;
-
-  background: #ffe8e8;
-  color: #e63946;
-
-  font-size: 12px;
-  margin-right: 5px;
-  margin-top: 6px;
-}
-
-/* =========================================================
- Right Info Card
-========================================================= */
-#info-card {
-  position: absolute;
-  top: 90px;
-  right: 20px;
-
-  width: 260px;
-  padding: 20px;
-
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-
-  border-radius: 18px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-
-  z-index: 999;
-}
-
-.info-item {
-  margin-bottom: 15px;
-}
-
-.info-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-}
-
-.info-value {
-  font-size: 13px;
-  color: #666;
-  margin-top: 3px;
-}
-
-/* Counters */
-.counter-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.counter-box {
-  width: 30%;
-  text-align: center;
-
-  padding: 10px 5px;
-
-  border-radius: 12px;
-  background: #fafafa;
-  border: 1px solid #eee;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  color: #333;
-}
-
-.counter-box small {
-  display: block;
-  font-size: 11px;
-  color: #888;
-}
-
-/* =========================================================
- Bottom Timeline Player
-========================================================= */
-#timeline-container {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  width: 90%;
-  max-width: 900px;
-
-  padding: 14px 20px;
-  border-radius: 16px;
-
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-
-  display: flex;
-  align-items: center;
-  gap: 16px;
-
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-}
-
-/* Buttons */
-.timeline-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  padding: 6px;
-  font-size: 22px;
-  border-radius: 8px;
-
-  transition: background 0.2s ease;
-}
-
-.timeline-btn:hover {
-  background: #eee;
-}
-
-/* Slider */
-#timeline-slider {
-  flex: 1;
-  height: 6px;
-
-  background: #ddd;
-  border-radius: 10px;
-}
-
-#timeline-slider::-webkit-slider-thumb {
-  width: 16px;
-  height: 16px;
-
-  background: #E63946;
-  border-radius: 50%;
-
-  cursor: pointer;
-}
-
-/* Time Display */
-.timeline-time {
-  font-size: 14px;
-  color: #444;
-}
-
-/* Speed Dropdown */
-#replay-speed {
-  padding: 5px 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.leaflet-control-zoom {
-  position: fixed !important;
-  right: 20px !important;
-  bottom: 20px !important;
-  z-index: 9999 !important;
-
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-}
-
-#timeline-container {
-  display: none; /* 默认隐藏 */
-}
-
-.filter-btn {
-  cursor: pointer;
-  border: 1px solid #eee;
-  background: #fafafa;
-  transition: 0.2s;
-}
-
-.filter-btn:hover {
-  background: #f0f0f0;
-}
-
-.filter-btn.active-filter {
-  background: #ffe8e8;
-  border-color: #e63946;
-  color: #e63946;
-  transform: scale(1.05);
-}
-
-/* =========================================================
-   📱 Mobile Beautiful Panel Styles
-========================================================= */
-@media (max-width: 768px) {
-
-  /* Panel layout */
-  #mobile-panel {
-    display: none;
-
-    position: fixed;
-    bottom: 0;
+/* Global Reset
+   全局样式重置：清除默认边距与内边距，统一盒模型，确保跨浏览器布局一致 */
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Inter, Arial, sans-serif;
+    background: #f4f6f8;
+    overflow: hidden;
+  }
+  
+  /* Header Bar (Top)
+     顶部导航栏区域：固定在页面顶部，用于展示标题与信息，采用透明背景与模糊制造层次感 */
+  .header-bar {
+    position: absolute;
+    top: 0;
     left: 0;
+  
     width: 100%;
-    height: 75%;
-
-    background: rgba(255, 255, 255, 0.98);
+    height: 70px;
+  
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
-
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
-
-    padding: 14px;
-    overflow-y: auto;
-    z-index: 10000;
-
-    /* New: vertical card layout */
+  
     display: flex;
-    flex-direction: column;
-    gap: 16px; /* spacing between cards */
+    align-items: center;
+  
+    padding: 0 25px;
+  
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    z-index: 900;
   }
-
-  /* Components inside the mobile panel look like cards */
-  #mobile-panel > #controls,
-  #mobile-panel > #info-card {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    width: 100% !important;
-    margin: 0 auto;
-
-    border: 1px solid #eee;
+  
+  .header-left h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #E63946;
   }
-
-  /* Title spacing fix */
-  #mobile-panel h3 {
+  
+  .header-left p {
+    font-size: 13px;
+    color: #666;
+    margin-top: 3px;
+  }
+  
+  /* Leaflet Map
+     地图容器：占满整个视口区域，用于承载 Leaflet 地图元素 */
+  #map {
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  /* Left Sidebar (Figma Card)
+     左侧控制卡片：采用半透明卡片样式，用于放置筛选按钮与功能控件 */
+  #controls {
+    position: absolute;
+    top: 90px;
+    left: 20px;
+    width: 260px;
+  
+    padding: 22px;
+    border-radius: 18px;
+  
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(14px);
+  
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+  
+    z-index: 999;
+  }
+  
+  /* Section Titles
+     控制面板标题：用于区分不同功能区域，提高结构层次感 */
+  #controls h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+    margin-top: 18px;
+  }
+  
+  /* Buttons
+     控制按钮样式：提供柔和的灰色背景与悬停反馈，提高交互体验 */
+  #controls button {
+    width: 100%;
+    padding: 12px 14px;
+  
+    font-size: 15px;
+    text-align: left;
+  
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+  
+    cursor: pointer;
+    margin-top: 8px;
+  
+    transition: all 0.2s ease;
+  }
+  
+  #controls button:hover {
+    background: #f0f0f0;
+    border-color: #ccc;
+    transform: translateY(-1px);
+  }
+  
+  /* Replay Dropdown
+     回放下拉栏：用于选择回放模式或预设内容的选择器组件 */
+  #controls select {
+    width: 100%;
+    padding: 10px;
+  
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+  
+    font-size: 14px;
     margin-top: 10px;
   }
-
-  /* Close Button prettier */
-  #mobile-close-btn {
-    position: absolute !important;
-    top: 10px !important;
-    right: 14px !important;
-
-    z-index: 20001;
-    font-size: 30px;
+  
+  /* Replay Main Button
+     回放主按钮：视觉强调的操作按钮，用于启动时间线回放 */
+  #start-replay {
+    width: 100%;
+    margin-top: 12px;
+  
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+  
+    background: #E63946;
+    color: #444;
+  
+    font-size: 16px;
+    font-weight: 600;
+  
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  #start-replay:hover {
+    background: #c22530;
+  }
+  
+  /* Active Filters
+     激活的筛选标签：显示当前启用的过滤条件，使用醒目的红色主题 */
+  .filter-chip {
+    display: inline-block;
+  
+    padding: 5px 10px;
+    border-radius: 12px;
+  
+    background: #ffe8e8;
+    color: #e63946;
+  
+    font-size: 12px;
+    margin-right: 5px;
+    margin-top: 6px;
+  }
+  
+  /* Right Info Card
+     右侧信息展示卡片：用于显示统计数据、说明信息，以卡片方式固定呈现 */
+  #info-card {
+    position: absolute;
+    top: 90px;
+    right: 20px;
+  
+    width: 260px;
+    padding: 20px;
+  
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+  
+    border-radius: 18px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  
+    z-index: 999;
+  }
+  
+  .info-item {
+    margin-bottom: 15px;
+  }
+  
+  .info-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+  }
+  
+  .info-value {
+    font-size: 13px;
+    color: #666;
+    margin-top: 3px;
+  }
+  
+  /* Counters
+     计数组件：三等分布局，显示统计数据（数量、频率等） */
+  .counter-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+  
+  .counter-box {
+    width: 30%;
+    text-align: center;
+  
+    padding: 10px 5px;
+  
+    border-radius: 12px;
+    background: #fafafa;
+    border: 1px solid #eee;
+  
+    font-size: 15px;
+    font-weight: 600;
+  
+    color: #333;
+  }
+  
+  .counter-box small {
+    display: block;
+    font-size: 11px;
+    color: #888;
+  }
+  
+  /* Bottom Timeline Player
+     底部时间轴播放器：用于控制回放进度、播放速度与时间显示 */
+  #timeline-container {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    width: 90%;
+    max-width: 900px;
+  
+    padding: 14px 20px;
+    border-radius: 16px;
+  
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+  
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+  
+  /* Player Buttons
+     时间轴按钮样式：包括播放、暂停、跳转等交互控件 */
+  .timeline-btn {
     background: none;
     border: none;
-
-    color: #333;
     cursor: pointer;
+  
+    padding: 6px;
+    font-size: 22px;
+    border-radius: 8px;
+  
+    transition: background 0.2s ease;
   }
-
-  /* Floating toggle button */
-  #mobile-toggle-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-
+  
+  .timeline-btn:hover {
+    background: #eee;
+  }
+  
+  /* Progress Slider
+     回放进度条：用于控制时间线位置，带有可拖动滑块 */
+  #timeline-slider {
+    flex: 1;
+    height: 6px;
+  
+    background: #ddd;
+    border-radius: 10px;
+  }
+  
+  #timeline-slider::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+  
     background: #E63946;
-    color: white;
-
-    font-size: 24px;
-    border: none;
+    border-radius: 50%;
+  
     cursor: pointer;
-
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    z-index: 10001;
   }
-
-  /* Hide original desktop positions */
-  #controls,
-  #info-card {
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
-
-    box-shadow: none;
+  
+  /* Time Display
+     显示当前回放的具体时间位置 */
+  .timeline-time {
+    font-size: 14px;
+    color: #444;
   }
-}
+  
+  /* Speed Dropdown
+     播放速度选择器：允许用户调整回放倍速 */
+  #replay-speed {
+    padding: 5px 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Leaflet Zoom Controls
+     调整地图缩放控件位置，使其固定在右下角且突出显示 */
+  .leaflet-control-zoom {
+    position: fixed !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    z-index: 9999 !important;
+  
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  
+  /* Timeline Hidden by Default
+     默认隐藏时间轴容器，待触发条件后显示 */
+  #timeline-container {
+    display: none;
+  }
+  
+  /* Filter Buttons
+     筛选按钮样式，包括悬停反馈与激活状态的红色高亮 */
+  .filter-btn {
+    cursor: pointer;
+    border: 1px solid #eee;
+    background: #fafafa;
+    transition: 0.2s;
+  }
+  
+  .filter-btn:hover {
+    background: #f0f0f0;
+  }
+  
+  .filter-btn.active-filter {
+    background: #ffe8e8;
+    border-color: #e63946;
+    color: #e63946;
+    transform: scale(1.05);
+  }
+  
+  /* Mobile Panel Styles
+     移动端底部弹出面板：适配小屏幕，将控制面板与信息面板合并显示 */
+  @media (max-width: 768px) {
+  
+    /* Mobile Panel Layout
+       移动端主面板：占据底部大区域，支持滚动与卡片式排列 */
+    #mobile-panel {
+      display: none;
+  
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 75%;
+  
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(12px);
+  
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+  
+      padding: 14px;
+      overflow-y: auto;
+      z-index: 10000;
+  
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  
+    /* Mobile Card Style
+       控制卡片在移动端呈现为整体卡片形式，更适合竖屏阅读 */
+    #mobile-panel > #controls,
+    #mobile-panel > #info-card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+  
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      width: 100% !important;
+      margin: 0 auto;
+  
+      border: 1px solid #eee;
+    }
+  
+    /* Title Spacing Fix
+       移动端标题的上边距调整，使整体视觉更一致 */
+    #mobile-panel h3 {
+      margin-top: 10px;
+    }
+  
+    /* Close Button
+       移动端关闭按钮：位于右上角，便于用户快速关闭面板 */
+    #mobile-close-btn {
+      position: absolute !important;
+      top: 10px !important;
+      right: 14px !important;
+  
+      z-index: 20001;
+      font-size: 30px;
+      background: none;
+      border: none;
+  
+      color: #333;
+      cursor: pointer;
+    }
+  
+    /* Floating Toggle Button
+       移动端打开面板的浮动按钮，圆形强调样式 */
+    #mobile-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+  
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+  
+      background: #E63946;
+      color: white;
+  
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+  
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      z-index: 10001;
+    }
+  
+    /* Hide Desktop Layout
+       移动端不再使用桌面端的悬浮位置，因此重置定位样式 */
+    #controls,
+    #info-card {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+  
+      box-shadow: none;
+    }
+  }
+  
